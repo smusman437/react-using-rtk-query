@@ -20,7 +20,25 @@ export const apiSlice = createApi({
         method: "POST",
         body: newPost,
       }),
-      invalidatesTags: ["Posts"],
+      // invalidatesTags: ["Posts"],
+      async onQueryStarted(newPost, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData("getPosts", undefined, (posts) => {
+            return [...posts, { id: posts.length + 1, ...newPost }];
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+
+          /**
+           * Alternatively, on failure you can invalidate the corresponding cache tags
+           * to trigger a re-fetch:
+           * dispatch(api.util.invalidateTags(['Post']))
+           */
+        }
+      },
     }),
     updatePost: builder.mutation({
       query: ({ id, ...updatedPost }) => ({
@@ -90,7 +108,6 @@ export const apiSlice = createApi({
       //   { type: "Posts", id },
       // ],
       async onQueryStarted(id, { dispatch, queryFulfilled }) {
-        console.log("id:", id);
         const patchResult = dispatch(
           apiSlice.util.updateQueryData("getPosts", undefined, (posts) => {
             return posts.filter((post) => {
