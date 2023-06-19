@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const apiSlice = createApi({
   reducerPath: "apiSlice",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3001/" }),
   tagTypes: ["Posts"],
   endpoints: (builder) => ({
     getPosts: builder.query({
@@ -38,7 +38,7 @@ export const apiSlice = createApi({
           /**
            * Alternatively, on failure you can invalidate the corresponding cache tags
            * to trigger a re-fetch:
-           * dispatch(api.util.invalidateTags(['Post']))
+           * dispatch(apiSlice.util.invalidateTags(['Post']))
            */
         }
       },
