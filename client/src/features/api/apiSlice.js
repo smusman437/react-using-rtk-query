@@ -9,6 +9,7 @@ export const apiSlice = createApi({
     getPosts: builder.query({
       query: () => "posts",
       providesTags: ["Posts"],
+      transformResponse: (response) => response.sort((a, b) => b.id - a.id),
     }),
     getPostById: builder.query({
       query: (id) => `posts/${id}`,
@@ -24,7 +25,9 @@ export const apiSlice = createApi({
       async onQueryStarted(newPost, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
           apiSlice.util.updateQueryData("getPosts", undefined, (posts) => {
-            return [...posts, { id: posts.length + 1, ...newPost }];
+            return [...posts, { id: posts.length + 1, ...newPost }].sort(
+              (a, b) => b.id - a.id
+            );
           })
         );
         try {
@@ -71,32 +74,6 @@ export const apiSlice = createApi({
            */
         }
       },
-      // onMutate: async ({ postId, ...updatedPost }) => {
-      //   // Get the current state from the cache
-      //   const previousState = apiSlice.endpoints.getPosts.select();
-      //   console.log("previousState:", previousState);
-
-      //   // Optimistically update the cache
-      //   apiSlice.endpoints.getPosts.updateQuery((data) => {
-      //     const updatedPosts = data.posts.map((post) =>
-      //       post.id === postId ? updatedPost : post
-      //     );
-      //     console.log("updatedPosts:", updatedPosts);
-      //     return {
-      //       ...data,
-      //       posts: updatedPosts,
-      //     };
-      //   });
-      //   console.log("previousState:", previousState);
-      //   // Return the previous state to rollback in case of an error
-      //   return { previousState };
-      // },
-      // onError: (error, variables, context) => {
-      //   if (context?.previousState) {
-      //     // Rollback to the previous state in case of an error
-      //     apiSlice.endpoints.getPosts.updateQuery(context.previousState);
-      //   }
-      // },
     }),
     deletePost: builder.mutation({
       query: (id) => ({
